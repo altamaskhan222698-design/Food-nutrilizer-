@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NutriVision Pro AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="onboardingModal" class="modal active">
+        <div class="modal-content glass">
+            <h2><i class="fas fa-robot"></i> Setup Profile</h2>
+            <p>Let's calculate your daily needs.</p>
+            <form id="profileForm">
+                <div class="input-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="userWeight" required placeholder="e.g. 60">
+                </div>
+                <div class="input-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="userHeight" required placeholder="e.g. 170">
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="number" id="userAge" required placeholder="e.g. 18">
+                </div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <select id="userGender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Start Journey</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-wrapper">
+        
+        <nav class="bottom-nav glass">
+            <button class="nav-btn active" data-target="dashboard"><i class="fas fa-home"></i></button>
+            <button class="nav-btn" data-target="scan"><i class="fas fa-camera"></i></button>
+            <button class="nav-btn" data-target="logs"><i class="fas fa-list"></i></button>
+            <button class="nav-btn" data-target="settings"><i class="fas fa-user-cog"></i></button>
+        </nav>
+
+        <section id="dashboard" class="view active">
+            <header>
+                <div class="header-text">
+                    <small>Today's Progress</small>
+                    <h1>Overview</h1>
+                </div>
+                <div class="avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="stats-container">
+                <div class="main-ring">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" id="calCircle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="ring-text">
+                        <span id="displayCals">0</span>
+                        <small>Kcal Left</small>
+                    </div>
+                </div>
+                
+                <div class="macro-grid">
+                    <div class="macro-card glass">
+                        <div class="dot protein"></div>
+                        <span>Protein</span>
+                        <b id="dashProtein">0g</b>
+                    </div>
+                    <div class="macro-card glass">
+                        <div class="dot carbs"></div>
+                        <span>Carbs</span>
+                        <b id="dashCarbs">0g</b>
+                    </div>
+                    <div class="macro-card glass">
+                        <div class="dot fat"></div>
+                        <span>Fat</span>
+                        <b id="dashFat">0g</b>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Scans</h3>
+                <ul id="recentList">
+                    <li class="empty-state">No food tracked yet today.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="scan" class="view">
+            <header>
+                <h1>Food Lens AI</h1>
+            </header>
+            
+            <div class="scanner-interface">
+                <div class="camera-viewport">
+                    <img id="imagePreview" src="" alt="Scan Preview">
+                    <div class="scan-overlay">
+                        <div class="scan-line"></div>
+                    </div>
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+                    <label for="cameraInput" class="camera-trigger glass">
+                        <i class="fas fa-shutter"></i> Tap to Capture
+                    </label>
+                </div>
+
+                <div class="manual-search">
+                    <div class="search-bar glass">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="manualSearchInput" placeholder="Search database...">
+                        <button onclick="app.handleSearch()">Go</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scanResult" class="result-sheet glass hidden">
+                <div class="drag-handle"></div>
+                <div class="food-info-head">
+                    <h2 id="resName">Detected Food</h2>
+                    <span id="resScore" class="confidence">98% AI Match</span>
+                </div>
+                
+                <div class="nutrition-strip">
+                    <div class="n-item">
+                        <i class="fas fa-fire"></i>
+                        <span id="resCal">0</span>
+                    </div>
+                    <div class="n-item">
+                        <i class="fas fa-dna"></i>
+                        <span id="resPro">0g</span>
+                    </div>
+                    <div class="n-item">
+                        <i class="fas fa-bread-slice"></i>
+                        <span id="resCarb">0g</span>
+                    </div>
+                </div>
+
+                <div class="health-indicators">
+                    <div class="indicator">
+                        <label>Digestion Time</label>
+                        <div class="progress-bg"><div class="progress-fill" style="width: 60%"></div></div>
+                        <small id="resDigest">2.5 Hours</small>
+                    </div>
+                    <div class="indicator">
+                        <label>Heaviness</label>
+                        <small id="resHeavy" class="badge">Moderate</small>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-secondary" onclick="app.discardScan()">Discard</button>
+                    <button class="btn-primary" onclick="app.saveFood()">Track This Food</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="logs" class="view">
+            <header>
+                <h1>History Log</h1>
+                <button class="btn-text" onclick="app.clearHistory()">Clear All</button>
+            </header>
+            <div class="log-list" id="fullLogList">
+                </div>
+        </section>
+
+        <section id="settings" class="view">
+            <header><h1>Settings</h1></header>
+            <div class="settings-list glass">
+                <div class="setting-item">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>Notifications</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item" onclick="app.resetProfile()">
+                    <span style="color: #ff4757">Reset All Data</span>
+                    <i class="fas fa-trash"></i>
+                </div>
+            </div>
+            <div class="about-app">
+                <p>NutriVision Pro v2.0</p>
+                <p>Build 2026.1.15</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+                          </html>
+                          
